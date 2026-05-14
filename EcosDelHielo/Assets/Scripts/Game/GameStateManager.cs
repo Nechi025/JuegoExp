@@ -2,12 +2,13 @@ using UnityEngine;
 
 namespace Game
 {
+    [ExecuteAlways]
     public class GameStateManager : MonoBehaviour
     {
         public GameState CurrentState { get; private set; } = GameState.Playing;
 
-        private void OnEnable()  => GameEventBus.OnGameOver += HandleGameOver;
-        private void OnDisable() => GameEventBus.OnGameOver -= HandleGameOver;
+        private void Awake()    => GameEventBus.OnGameOver += HandleGameOver;
+        private void OnDestroy() => GameEventBus.OnGameOver -= HandleGameOver;
 
         private void HandleGameOver()
         {

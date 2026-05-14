@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Game
 {
+    [ExecuteAlways]
     public class ScoreManager : MonoBehaviour
     {
         private GameConfig _config;
@@ -12,15 +13,14 @@ namespace Game
         public float TimeAlive           { get; private set; }
         public int   DeliveriesCompleted { get; private set; }
 
-        private void Awake() => _config = ServiceLocator.Get<GameConfig>();
-
-        private void OnEnable()
+        private void Awake()
         {
+            ServiceLocator.TryGet<GameConfig>(out _config);
             GameEventBus.OnDeliverySuccess += HandleDelivery;
             GameEventBus.OnStateChanged    += HandleStateChanged;
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             GameEventBus.OnDeliverySuccess -= HandleDelivery;
             GameEventBus.OnStateChanged    -= HandleStateChanged;
@@ -31,14 +31,14 @@ namespace Game
 
         private void HandleDelivery()
         {
-            if (_isGameOver) return;
+            if (_isGameOver || _config == null) return;
             Score += _config.scorePerDelivery;
             DeliveriesCompleted++;
         }
 
         public void Tick(float deltaTime)
         {
-            if (_isGameOver) return;
+            if (_isGameOver || _config == null) return;
             TimeAlive += deltaTime;
             Score     += Mathf.FloorToInt(_config.scorePerSecond * deltaTime);
         }

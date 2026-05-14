@@ -18,7 +18,7 @@ namespace Game
         [Min(0.1f)] public float beltMoveSpeed = 1f;
 
         [Header("Customers")]
-        [Min(0.5f)] public float customerPatienceTime = 10f;
+        [Min(0.5f)] public float customerPatienceTime = 10f; 
         [Min(0.5f)] public float customerSpawnInterval = 5f;
         [Min(1f)]   public float bottleTimeout = 12f;
         [Min(1)] public int maxCustomers = 4;

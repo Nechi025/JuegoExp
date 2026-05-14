@@ -6,6 +6,7 @@ namespace Game.Panels.Glaciers
 {
     public enum GlacierState { Idle, Regenerating }
 
+    [ExecuteAlways]
     public class Glacier : MonoBehaviour
     {
         private GameConfig _config;
@@ -17,11 +18,11 @@ namespace Game.Panels.Glaciers
 
         public bool IsClickable => State == GlacierState.Idle;
 
-        private void Awake() => _config = ServiceLocator.Get<GameConfig>();
+        private void Awake() => ServiceLocator.TryGet<GameConfig>(out _config);
 
         public void OnClick()
         {
-            if (!IsClickable) return;
+            if (!IsClickable || _config == null) return;
             ClickCount++;
             if (ClickCount >= _config.glacierClicksToBreak)
                 CalveIceCube();
@@ -51,6 +52,7 @@ namespace Game.Panels.Glaciers
 
         private void TickDecay(float deltaTime)
         {
+            if (_config == null) return;
             PassiveHealth -= _config.glacierPassiveDecayRate * deltaTime;
             if (PassiveHealth > 0f) return;
             PassiveHealth = 0f;
@@ -60,6 +62,7 @@ namespace Game.Panels.Glaciers
 
         private void TickRegen(float deltaTime)
         {
+            if (_config == null) return;
             RegenProgress += deltaTime / _config.glacierRegenTime;
             if (RegenProgress < 1f) return;
             RegenProgress = 1f;
