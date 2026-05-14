@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Game
 {
+    [ExecuteAlways]
     public class MistakeManager : MonoBehaviour
     {
         private GameConfig _config;

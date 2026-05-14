@@ -480,7 +480,7 @@ TextureImporter:
         serializedVersion: 2
         x: 63
         y: 540
-        width: 129
+        width: 65
         height: 108
       alignment: 9
       pivot: {x: 0.2635659, y: 0.4814815}
@@ -491,6 +491,27 @@ TextureImporter:
       bones: []
       spriteID: ef5a20ef1ba3ad54b952e7509ac072a9
       internalID: 835078169
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GlaciarSheet_0
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 540
+        width: 64
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5bc1e1d27d093b44d9af84fc38703fb9
+      internalID: -689010156
       vertices: []
       indices: 
       edges: []
@@ -508,6 +529,7 @@ TextureImporter:
     nameFileIdTable:
       1stStuff: -445228926
       2ndStuff: 835078169
+      GlaciarSheet_0: -689010156
       GlaciarSheet_1: 723808077
       GlaciarSheet_10: -13002787
       GlaciarSheet_11: -1827659660
