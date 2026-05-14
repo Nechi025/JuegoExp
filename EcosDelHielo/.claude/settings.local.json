@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(New-Item -ItemType Directory -Path \"F:/Unity Projects/JuegoExp/EcosDelHielo/Assets/Scripts/Core/ServiceLocator\" -Force)",
+      "Bash(Out-Null)",
+      "Bash(New-Item -ItemType Directory -Path \"F:/Unity Projects/JuegoExp/EcosDelHielo/Assets/Tests/Editor\" -Force)",
+      "Bash(Write-Output \"Directories created\")",
+      "PowerShell(New-Item *)",
+      "Bash(git add *)",
+      "Bash(bash *)",
+      "Bash(Get-ChildItem -Path \"F:\\\\Unity Projects\\\\JuegoExp\\\\EcosDelHielo\\\\Assets\" -Force)",
+      "Bash(Select-Object Name)",
+      "Bash(Get-ChildItem -Path \"F:\\\\Unity Projects\\\\JuegoExp\\\\EcosDelHielo\\\\Assets\\\\Scripts\\\\Game\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object FullName)",
+      "Bash(Get-ChildItem -Path \"F:\\\\Unity Projects\\\\JuegoExp\\\\EcosDelHielo\\\\Assets\\\\Scripts\" -Recurse -ErrorAction SilentlyContinue)",
+      "Bash(Get-ChildItem *)",
+      "Bash(ls -la \"F:\\\\\\\\Unity Projects\\\\\\\\JuegoExp\\\\\\\\EcosDelHielo\\\\\\\\Assets\\\\\\\\Scripts\")",
+      "Bash(find \"F:\\\\\\\\Unity Projects\\\\\\\\JuegoExp\\\\\\\\EcosDelHielo\\\\\\\\Assets\\\\\\\\Scripts\" -type f -name \"*.cs\")",
+      "Bash(ls \"F:\\\\\\\\Unity Projects\\\\\\\\JuegoExp\\\\\\\\EcosDelHielo\\\\\\\\Assets\\\\\\\\Scripts\\\\\\\\Game\\\\\\\\ScoreManager.cs\")",
+      "Bash(find \"F:\\\\\\\\Unity Projects\\\\\\\\JuegoExp\\\\\\\\EcosDelHielo\\\\\\\\Assets\\\\\\\\Tests\" -type f)",
+      "Bash(Get-Item \"F:\\\\Unity Projects\\\\JuegoExp\\\\EcosDelHielo\\\\Assets\\\\Scripts\\\\Game\\\\DifficultyManager.*\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object Name, Length)",
+      "Bash(New-Item -ItemType Directory -Force -Path \"F:\\\\Unity Projects\\\\JuegoExp\\\\EcosDelHielo\\\\Assets\\\\Scripts\\\\Game\\\\Panels\\\\Funnel\")",
+      "Bash(Write-Output \"OK\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"F:\\\\Unity Projects\\\\JuegoExp\\\\EcosDelHielo\\\\Assets\\\\Scripts\\\\Game\\\\Panels\\\\Customers\")",
+      "Bash(Write-Output \"Directory ready\")"
+    ]
+  }
+}

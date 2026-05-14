@@ -104,3 +104,8 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+/EcosDelHielo/.idea
+/EcosDelHielo/Temp
+EcosDelHielo/CLAUDE.md
+/EcosDelHielo/.superpowers
+/EcosDelHielo/docs
