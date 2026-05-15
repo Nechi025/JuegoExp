@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Core;
 using Core.Services;
 using Game;
@@ -8,9 +9,6 @@ namespace Game.Panels.Funnel
     public class FunnelPanel : MonoBehaviour
     {
         [Header("Bottle Path")]
-        [SerializeField] private Transform      bottleSpawnPoint;
-        [SerializeField] private Transform      bottleFillPoint;
-        [SerializeField] private Transform      bottleLeavePoint;
         [SerializeField] private BottleConveyor bottleConveyor;
 
         [Header("Ice Ball")]
@@ -22,10 +20,11 @@ namespace Game.Panels.Funnel
 
         private GameConfig      _config;
         private GameState       _gameState = GameState.Playing;
-        private IceCube         _fallingCube;
         private Bottle          _currentBottle;
-        private bool            _cubeParked;
         private TriggerNotifier _funnelMouthNotifier;
+
+        private readonly List<IceCube>  _activeCubes = new List<IceCube>();
+        private readonly Queue<IceCube> _parkedQueue  = new Queue<IceCube>();
 
         private void Awake()
         {
@@ -33,6 +32,11 @@ namespace Game.Panels.Funnel
                                 ?? funnelMouth.gameObject.AddComponent<TriggerNotifier>();
             _funnelMouthNotifier.OnEntered += OnIceCubeEnteredMouth;
 
+            if (bottleConveyor == null)
+            {
+                Debug.LogError("[FunnelPanel] bottleConveyor is not assigned in the Inspector.", this);
+                return;
+            }
             bottleConveyor.OnArrived  += OnBottleArrived;
             bottleConveyor.OnDeparted += OnBottleDeparted;
 
@@ -55,17 +59,16 @@ namespace Game.Panels.Funnel
         {
             _config        = ServiceLocator.Get<GameManager>().Config;
             _currentBottle = new Bottle(_config.cubesPerBottle);
-            bottleConveyor.BeginCycle(bottleSpawnPoint.position, bottleFillPoint.position);
+            bottleConveyor.BeginCycle();
         }
 
         private void HandleStateChanged(GameState state) => _gameState = state;
 
         private void HandleIceCubeSpawned()
         {
-            if (_fallingCube != null) return;
-            var go = Instantiate(iceCubePrefab, iceBallSpawnPoint.position, Quaternion.identity);
-            _fallingCube = go.GetComponent<IceCube>();
-            _cubeParked  = false;
+            var go   = Instantiate(iceCubePrefab, iceBallSpawnPoint.position, Quaternion.identity);
+            var cube = go.GetComponent<IceCube>();
+            _activeCubes.Add(cube);
 
             float angle = Random.Range(-maxSpawnAngle, maxSpawnAngle);
             var   dir   = Quaternion.Euler(0f, 0f, angle) * Vector2.down;
@@ -76,53 +79,47 @@ namespace Game.Panels.Funnel
         private void OnIceCubeEnteredMouth(Collider2D other)
         {
             if (_gameState != GameState.Playing) return;
-            if (_fallingCube == null || other.gameObject != _fallingCube.gameObject) return;
+            if (_parkedQueue.Count > 0) return;
+            var cube = _activeCubes.Find(c => c != null && c.gameObject == other.gameObject);
+            if (cube == null) return;
 
-            if (!bottleConveyor.IsReadyToFill)
-                ParkCube();
+            if (bottleConveyor.IsReadyToFill)
+                DepositCube(cube);
             else
-                DepositCube();
+                ParkCube(cube);
         }
 
-        private void ParkCube()
+        private void ParkCube(IceCube cube)
         {
-            if (_cubeParked) return;
-            _cubeParked = true;
-            var rb = _fallingCube.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                rb.velocity    = Vector2.zero;
-                rb.isKinematic = true;
-            }
-            _fallingCube.transform.position = funnelMouth.transform.position;
+            if (_parkedQueue.Contains(cube)) return;
+            var rb = cube.GetComponent<Rigidbody2D>();
+            if (rb != null) { rb.velocity = Vector2.zero; rb.isKinematic = true; }
+            cube.transform.position = funnelMouth.transform.position;
+            _parkedQueue.Enqueue(cube);
         }
 
         private void OnBottleArrived()
         {
-            if (_fallingCube != null && _cubeParked)
-                DepositCube();
+            if (_parkedQueue.Count > 0)
+                DepositCube(_parkedQueue.Dequeue());
         }
 
         private void OnBottleDeparted(bool _) =>
-            bottleConveyor.BeginCycle(bottleSpawnPoint.position, bottleFillPoint.position);
+            bottleConveyor.BeginCycle();
 
-        private void DepositCube()
+        private void DepositCube(IceCube cube)
         {
-            var rb = _fallingCube.GetComponent<Rigidbody2D>();
+            _activeCubes.Remove(cube);
+            var rb = cube.GetComponent<Rigidbody2D>();
             if (rb != null) rb.isKinematic = false;
 
-            _fallingCube.ReachFunnel();
-            _currentBottle.AddCube(_fallingCube.IsPure);
-            Destroy(_fallingCube.gameObject);
-            _fallingCube = null;
-            _cubeParked  = false;
+            cube.ReachFunnel();
+            _currentBottle.AddCube(cube.IsPure);
+            Destroy(cube.gameObject);
 
             if (!_currentBottle.IsFull) return;
-
-            bottleConveyor.Depart(bottleLeavePoint.position, !_currentBottle.IsTainted);
+            bottleConveyor.Depart(!_currentBottle.IsTainted);
             _currentBottle = new Bottle(_config.cubesPerBottle);
         }
-
-        public void OnCubeClicked() => _fallingCube?.OnClick();
     }
 }

@@ -23,7 +23,8 @@
       "Bash(New-Item -ItemType Directory -Force -Path \"F:\\\\Unity Projects\\\\JuegoExp\\\\EcosDelHielo\\\\Assets\\\\Scripts\\\\Game\\\\Panels\\\\Funnel\")",
       "Bash(Write-Output \"OK\")",
       "Bash(New-Item -ItemType Directory -Force -Path \"F:\\\\Unity Projects\\\\JuegoExp\\\\EcosDelHielo\\\\Assets\\\\Scripts\\\\Game\\\\Panels\\\\Customers\")",
-      "Bash(Write-Output \"Directory ready\")"
+      "Bash(Write-Output \"Directory ready\")",
+      "Skill(superpowers:brainstorming)"
     ]
   }
 }

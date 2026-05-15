@@ -12,17 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b342b0ecaf0fd9646a921e5e73f0a628, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: 
-  glacierClicksToBreak: 20
-  glacierPassiveDecayRate: 0.05
-  glacierRegenTime: 8
-  purifyClicksRequired: 5
-  cubesPerBottle: 3
-  iceCubeFallSpeed: 2
-  beltMoveSpeed: 1
-  customerPatienceTime: 10
+  glacierClicksPerIceBall: 1
+  glacierPassiveDecayRate: 0
+  glacierClickDamage: 0.001
+  purifyClicksRequired: 3
+  cubesPerBottle: 1
+  customerPatienceTime: 180
   customerSpawnInterval: 5
-  bottleTimeout: 12
-  maxCustomers: 4
+  bottleTimeout: 180
   difficultyRampDuration: 120
   maxMistakes: 5
   scorePerDelivery: 100

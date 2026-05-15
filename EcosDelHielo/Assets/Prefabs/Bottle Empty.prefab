@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5238256554530273708}
   - component: {fileID: 6092457941547761125}
   - component: {fileID: 6393410141170502871}
-  - component: {fileID: 2212031070168871317}
+  - component: {fileID: 787703456596719415}
   m_Layer: 5
   m_Name: Bottle Empty
   m_TagString: Untagged
@@ -76,7 +76,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2212031070168871317
+--- !u!114 &787703456596719415
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -85,11 +85,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 496074566473396256}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28f89779e4ca7c9448321de3d8c83b34, type: 3}
+  m_Script: {fileID: 11500000, guid: 58e71dbd7d3208e4bb0fc4d3b9b8f2fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   emptySprite: {fileID: -1910103692, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
-  fullSprite: {fileID: -13002787, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
+  purifiedBottleSprite: {fileID: -13002787, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
+  contaminatedBottleSprite: {fileID: -13002787, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
   enterDuration: 0.6
   exitDuration: 0.5
   image: {fileID: 6393410141170502871}

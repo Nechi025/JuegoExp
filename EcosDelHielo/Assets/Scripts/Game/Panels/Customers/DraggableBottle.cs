@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,51 +10,78 @@ namespace Game.Panels.Customers
         [SerializeField] private float snapRadius = 150f;
 
         private CustomerPanel _panel;
-        private Transform[]   _slots;
+        private Customer[]    _customers;
         private Transform     _recycleBin;
         private Canvas        _canvas;
         private RectTransform _rectTransform;
         private CanvasGroup   _canvasGroup;
-        private Vector3       _startWorldPos;
+        private Transform     _homeParent;
+        private Vector2       _homeAnchoredPos;
 
-        public void Init(CustomerPanel panel, Transform[] slots, Transform recycleBin)
+        public bool IsActive => gameObject.activeSelf;
+
+        private void Awake()
         {
-            _panel         = panel;
-            _slots         = slots;
-            _recycleBin    = recycleBin;
-            _rectTransform = GetComponent<RectTransform>();
-            _canvasGroup   = GetComponent<CanvasGroup>();
-            _canvas        = GetComponentInParent<Canvas>();
-            _startWorldPos = transform.position;
-            Debug.Log("[DraggableBottle] Spawned and ready");
+            _rectTransform   = GetComponent<RectTransform>();
+            _canvasGroup     = GetComponent<CanvasGroup>();
+            _canvas          = GetComponentInParent<Canvas>(true);
+            _homeParent      = transform.parent;
+            _homeAnchoredPos = _rectTransform.anchoredPosition;
+            gameObject.SetActive(false);
+        }
+
+        public void Activate(CustomerPanel panel, Customer[] customers, Transform recycleBin)
+        {
+            _panel      = panel;
+            _customers  = customers;
+            _recycleBin = recycleBin;
+            _canvasGroup.alpha = 0f;
+
+            // Position at home location first so world position is correct
+            transform.SetParent(_homeParent, false);
+            _rectTransform.anchoredPosition = _homeAnchoredPos;
+
+            // Then move to canvas root so bottle renders on top of all other UI
+            transform.SetParent(_canvas.transform, true);
+
+            gameObject.SetActive(true);
+            DOTween.To(() => _canvasGroup.alpha, x => _canvasGroup.alpha = x, 1f, 0.2f);
+        }
+
+        public void Deactivate()
+        {
+            DOTween.To(() => _canvasGroup.alpha, x => _canvasGroup.alpha = x, 0f, 0.2f)
+                   .OnComplete(() =>
+                   {
+                       transform.SetParent(_homeParent, false);
+                       _rectTransform.anchoredPosition = _homeAnchoredPos;
+                       gameObject.SetActive(false);
+                   });
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
+            // Already in canvas root from Activate — just disable raycasts so drop targets are hittable
             _canvasGroup.blocksRaycasts = false;
-            Debug.Log("[DraggableBottle] Begin drag");
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                _canvas.transform as RectTransform,
-                eventData.position,
-                _canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _canvas.worldCamera,
-                out var localPoint);
-            _rectTransform.localPosition = localPoint;
+            _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
             _canvasGroup.blocksRaycasts = true;
 
+            Camera  cam     = _canvas.worldCamera;
+            Vector2 dropPos = eventData.position;
+
             if (_recycleBin != null)
             {
-                float dist = Vector2.Distance(transform.position, _recycleBin.position);
-                if (dist <= snapRadius)
+                Vector2 binScreen = RectTransformUtility.WorldToScreenPoint(cam, _recycleBin.position);
+                if (Vector2.Distance(dropPos, binScreen) <= snapRadius)
                 {
-                    Debug.Log("[DraggableBottle] Dropped on recycle bin");
                     _panel.OnBottleDroppedOnRecycleBin();
                     return;
                 }
@@ -61,21 +89,23 @@ namespace Game.Panels.Customers
 
             int   closest     = -1;
             float closestDist = snapRadius;
-            for (int i = 0; i < _slots.Length; i++)
+            for (int i = 0; i < _customers.Length; i++)
             {
-                float d = Vector2.Distance(transform.position, _slots[i].position);
+                Vector2 custScreen = RectTransformUtility.WorldToScreenPoint(cam, _customers[i].transform.position);
+                float d = Vector2.Distance(dropPos, custScreen);
                 if (d < closestDist) { closestDist = d; closest = i; }
             }
 
             if (closest >= 0)
             {
-                Debug.Log($"[DraggableBottle] Dropped on customer slot {closest}");
                 _panel.OnBottleDroppedOnSlot(closest);
             }
             else
             {
-                Debug.Log("[DraggableBottle] No valid target — returning to spawn");
-                transform.position = _startWorldPos;
+                // Return to home position visually while staying in canvas root
+                transform.SetParent(_homeParent, false);
+                _rectTransform.anchoredPosition = _homeAnchoredPos;
+                transform.SetParent(_canvas.transform, true);
             }
         }
     }

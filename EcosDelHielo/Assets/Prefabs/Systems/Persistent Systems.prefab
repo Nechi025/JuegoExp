@@ -140,7 +140,8 @@ PrefabInstance:
       value: Transition Canvas
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5853062372647564031, guid: 144e28e7c26370c43a7f5adc8cd3423f, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 144e28e7c26370c43a7f5adc8cd3423f, type: 3}

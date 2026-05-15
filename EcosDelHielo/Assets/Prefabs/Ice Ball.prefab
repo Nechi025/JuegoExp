@@ -102,7 +102,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 0.1
+  m_GravityScale: 0.05
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -161,8 +161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a03701dc8f33da64c89cf43fe3de5810, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sprites:
-  - {fileID: -847488342, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
-  - {fileID: -1827659660, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
-  - {fileID: 1761050728, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
-  - {fileID: 1027734775, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
+  purifySprites: []
+  purifiedSprite: {fileID: 1761050728, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
+  contaminatedSprite: {fileID: 1027734775, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
+  hitParticles: {fileID: 0}

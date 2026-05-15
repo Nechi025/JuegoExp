@@ -1,6 +1,8 @@
 using Core.Services;
+using DG.Tweening;
 using Game;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game.Panels.Glaciers
 {
@@ -10,8 +12,12 @@ namespace Game.Panels.Glaciers
     public class Glacier : MonoBehaviour
     {
         [SerializeField] private Sprite[]       healthSprites;
-        [SerializeField] private SpriteRenderer sr;
+        [SerializeField] private Image sr;
+        [SerializeField] private ParticleSystem iceParticles;
 
+        private static readonly Color IceBlue = new Color(0.5f, 0.8f, 1f);
+
+        private RectTransform _rt;
         private GameConfig   _config;
 
         public GlacierState State  { get; private set; } = GlacierState.Active;
@@ -24,6 +30,7 @@ namespace Game.Panels.Glaciers
 
         private void Awake()
         {
+            _rt = GetComponent<RectTransform>();
             if (ServiceLocator.TryGet<GameManager>(out var gm)) _config = gm.Config;
             RollNewTarget();
             UpdateSprite();
@@ -39,6 +46,8 @@ namespace Game.Panels.Glaciers
             Health = Mathf.Max(0f, Health - _config.glacierClickDamage);
             Debug.Log($"[Glacier] Click {_clicksThisCycle}/{_targetThisCycle}, health: {Health:F2}");
 
+            PlayHitEffects();
+
             if (_clicksThisCycle >= _targetThisCycle)
             {
                 Debug.Log("[Glacier] Ice ball spawned");
@@ -52,12 +61,35 @@ namespace Game.Panels.Glaciers
                 UpdateSprite();
         }
 
+        private void PlayHitEffects()
+        {
+            if (_rt != null)
+            {
+                Vector2 origin = _rt.anchoredPosition;
+                DOTween.Sequence()
+                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin + new Vector2( 6f, 0f), 0.04f))
+                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin + new Vector2(-6f, 0f), 0.04f))
+                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin + new Vector2( 4f, 0f), 0.04f))
+                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin,                        0.04f));
+            }
+            if (sr != null)
+                DOTween.To(() => sr.color, x => sr.color = x, IceBlue, 0.1f)
+                       .OnComplete(() => DOTween.To(() => sr.color, x => sr.color = x, Color.white, 0.15f));
+            else
+                Debug.LogWarning("[Glacier] sr (Image) is not assigned — tint effect skipped.", this);
+
+            if (iceParticles != null)
+                iceParticles.Play();
+            else
+                Debug.LogWarning("[Glacier] iceParticles is not assigned — particle effect skipped.", this);
+        }
+
         private void RollNewTarget()
         {
             _clicksThisCycle = 0;
             _targetThisCycle = _config != null
-                ? Random.Range(_config.glacierClicksMin, _config.glacierClicksMax + 1)
-                : 10;
+                ? _config.glacierClicksPerIceBall
+                : 1;
             Debug.Log($"[Glacier] Next ice ball in {_targetThisCycle} clicks");
         }
 
@@ -67,7 +99,32 @@ namespace Game.Panels.Glaciers
             Health = 0f;
             Debug.Log("[Glacier] Permanently broken!");
             GameEventBus.RaiseMistake();
-            UpdateSprite();
+            PlayBreakEffect();
+        }
+
+        private void PlayBreakEffect()
+        {
+            if (_rt == null || sr == null) return;
+
+            Vector2 origin   = _rt.anchoredPosition;
+            float   duration = 1.2f;
+
+            DOTween.Sequence()
+                .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin + new Vector2( 8f, 0f), 0.04f))
+                .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin + new Vector2(-8f, 0f), 0.04f))
+                .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin + new Vector2( 6f, 0f), 0.04f))
+                .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin + new Vector2(-6f, 0f), 0.04f))
+                .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin,                        0.04f))
+                .Append(DOTween.To(
+                    () => _rt.anchoredPosition,
+                    p  => _rt.anchoredPosition = p,
+                    origin + new Vector2(0f, -120f),
+                    duration).SetEase(Ease.InQuad))
+                .OnComplete(() => gameObject.SetActive(false));
+
+            DOTween.To(() => sr.color, x => sr.color = x, new Color(1f, 1f, 1f, 0f), duration)
+                   .SetEase(Ease.InQuad)
+                   .SetDelay(0.2f);
         }
 
         public void Tick(float deltaTime)

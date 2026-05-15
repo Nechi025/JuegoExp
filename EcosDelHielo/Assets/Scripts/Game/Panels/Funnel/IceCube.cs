@@ -6,7 +6,10 @@ namespace Game.Panels.Funnel
 {
     public class IceCube : MonoBehaviour
     {
-        [SerializeField] private Sprite[] purifySprites;
+        [SerializeField] private Sprite[]       purifySprites;
+        [SerializeField] private Sprite         purifiedSprite;
+        [SerializeField] private Sprite         contaminatedSprite;
+        [SerializeField] private ParticleSystem hitParticles;
 
         private SpriteRenderer _sr;
         private GameConfig     _config;
@@ -21,7 +24,11 @@ namespace Game.Panels.Funnel
 
         private void Awake()
         {
-            _sr                   = GetComponent<SpriteRenderer>();
+            _sr = GetComponent<SpriteRenderer>();
+        }
+
+        private void Start()
+        {
             _purifyClicksRequired = Config.purifyClicksRequired;
             UpdateSprite();
         }
@@ -30,9 +37,13 @@ namespace Game.Panels.Funnel
 
         public void OnClick()
         {
-            if (_hasReachedFunnel) return;
+            if (_hasReachedFunnel || IsPure) return;
             _purifyClicks++;
             Debug.Log($"[IceCube] Purify click {_purifyClicks}/{_purifyClicksRequired}");
+            if (hitParticles != null)
+                hitParticles.Play();
+            else
+                Debug.LogWarning("[IceCube] hitParticles is not assigned — particle effect skipped.", this);
             UpdateSprite();
         }
 
@@ -40,6 +51,8 @@ namespace Game.Panels.Funnel
         {
             if (_hasReachedFunnel) return;
             _hasReachedFunnel = true;
+            if (_sr != null)
+                _sr.sprite = IsPure ? purifiedSprite : contaminatedSprite;
             Debug.Log($"[IceCube] Reached funnel — IsPure: {IsPure}");
             if (!IsPure) GameEventBus.RaiseMistake();
         }
