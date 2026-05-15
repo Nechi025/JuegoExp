@@ -34,10 +34,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 48, y: 128}
-  m_SizeDelta: {x: 80, y: 170}
+  m_AnchorMin: {x: 0.50447917, y: 0.53933316}
+  m_AnchorMax: {x: 0.5464792, y: 0.70100003}
+  m_AnchoredPosition: {x: -1.5, y: -1}
+  m_SizeDelta: {x: -1, y: -4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1083060950129910509
 CanvasRenderer:
@@ -102,3 +102,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   snapRadius: 150
+  bottleImage: {fileID: 7303114231367141585}
+  purifiedSprite: {fileID: -872268495, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
+  contaminatedSprite: {fileID: -872268495, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}

@@ -6,21 +6,19 @@ namespace Game.Panels.Customers
 {
     public class CustomerPanel : MonoBehaviour
     {
-        [SerializeField] private Customer[]      customers;
-        [SerializeField] private DraggableBottle bottle;
-        [SerializeField] private Transform       recycleBinZone;
+        [SerializeField] private Customer[]       customers;
+        [SerializeField] private DraggableBottle[] bottles;
+        [SerializeField] private Transform        recycleBinZone;
 
         private GameConfig _config;
-        private bool       _isPureBottle;
         private GameState  _gameState = GameState.Playing;
         private float      _spawnTimer;
-        private float      _bottleTimer;
 
         private void Start()
         {
             _config = ServiceLocator.Get<GameManager>().Config;
             foreach (var c in customers) c.gameObject.SetActive(false);
-            bottle.gameObject.SetActive(false);
+            foreach (var b in bottles)  b.gameObject.SetActive(false);
         }
 
         private void OnEnable()
@@ -39,36 +37,23 @@ namespace Game.Panels.Customers
 
         private void HandleBottleReady(bool isPure)
         {
-            if (bottle.IsActive) return;
-            _isPureBottle = isPure;
-            bottle.Activate(this, customers, recycleBinZone);
-            Debug.Log($"[CustomerPanel] Bottle activated — isPure: {isPure}");
+            for (int i = 0; i < bottles.Length; i++)
+            {
+                if (bottles[i].IsActive) continue;
+                bottles[i].Activate(this, customers, recycleBinZone, isPure, _config.bottleTimeout);
+                Debug.Log($"[CustomerPanel] Bottle {i} activated — isPure: {isPure}");
+                return;
+            }
+            Debug.LogWarning("[CustomerPanel] No inactive bottle available — bottle lost.");
         }
 
         private void Update()
         {
             if (_gameState != GameState.Playing) return;
-            TickCustomerSpawn(Time.deltaTime);
-            TickBottleTimeout(Time.deltaTime);
-        }
-
-        private void TickCustomerSpawn(float deltaTime)
-        {
-            _spawnTimer += deltaTime;
+            _spawnTimer += Time.deltaTime;
             if (_spawnTimer < _config.customerSpawnInterval) return;
             _spawnTimer = 0f;
             TryShowCustomer();
-        }
-
-        private void TickBottleTimeout(float deltaTime)
-        {
-            if (!bottle.IsActive) { _bottleTimer = 0f; return; }
-            _bottleTimer += deltaTime;
-            if (_bottleTimer < _config.bottleTimeout) return;
-            _bottleTimer = 0f;
-            Debug.Log("[CustomerPanel] Bottle timed out — mistake");
-            bottle.Deactivate();
-            GameEventBus.RaiseMistake();
         }
 
         private void TryShowCustomer()
@@ -82,7 +67,7 @@ namespace Game.Panels.Customers
             }
         }
 
-        public void OnBottleDroppedOnSlot(int slotIndex)
+        public void OnBottleDropped(DraggableBottle bottle, int slotIndex)
         {
             if (!bottle.IsActive) return;
             if (slotIndex < 0 || slotIndex >= customers.Length) return;
@@ -92,7 +77,7 @@ namespace Game.Panels.Customers
                 return;
             }
 
-            if (!_isPureBottle)
+            if (!bottle.IsPure)
             {
                 Debug.Log($"[CustomerPanel] Tainted bottle delivered to slot {slotIndex} — mistake");
                 GameEventBus.RaiseMistake();
@@ -103,17 +88,22 @@ namespace Game.Panels.Customers
                 GameEventBus.RaiseDeliverySuccess();
             }
 
-            customers[slotIndex].Serve(_isPureBottle);
+            customers[slotIndex].Serve(bottle.IsPure);
             bottle.Deactivate();
-            _bottleTimer = 0f;
         }
 
-        public void OnBottleDroppedOnRecycleBin()
+        public void OnBottleRecycled(DraggableBottle bottle)
         {
             if (!bottle.IsActive) return;
             Debug.Log("[CustomerPanel] Bottle recycled");
             bottle.Deactivate();
-            _bottleTimer = 0f;
+        }
+
+        public void OnBottleTimedOut(DraggableBottle bottle)
+        {
+            Debug.Log("[CustomerPanel] Bottle timed out — mistake");
+            bottle.Deactivate();
+            GameEventBus.RaiseMistake();
         }
     }
 }

@@ -1,13 +1,17 @@
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Game.Panels.Customers
 {
     [RequireComponent(typeof(CanvasGroup))]
     public class DraggableBottle : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
-        [SerializeField] private float snapRadius = 150f;
+        [SerializeField] private float  snapRadius = 150f;
+        [SerializeField] private Image  bottleImage;
+        [SerializeField] private Sprite purifiedSprite;
+        [SerializeField] private Sprite contaminatedSprite;
 
         private CustomerPanel _panel;
         private Customer[]    _customers;
@@ -17,8 +21,12 @@ namespace Game.Panels.Customers
         private CanvasGroup   _canvasGroup;
         private Transform     _homeParent;
         private Vector2       _homeAnchoredPos;
+        private bool          _activated;
+        private float         _timer;
+        private float         _timeout;
 
-        public bool IsActive => gameObject.activeSelf;
+        public bool IsPure   { get; private set; }
+        public bool IsActive => _activated;
 
         private void Awake()
         {
@@ -30,18 +38,22 @@ namespace Game.Panels.Customers
             gameObject.SetActive(false);
         }
 
-        public void Activate(CustomerPanel panel, Customer[] customers, Transform recycleBin)
+        public void Activate(CustomerPanel panel, Customer[] customers, Transform recycleBin, bool isPure, float timeout)
         {
             _panel      = panel;
             _customers  = customers;
             _recycleBin = recycleBin;
+            IsPure      = isPure;
+            _timeout    = timeout;
+            _timer      = 0f;
+            _activated  = true;
             _canvasGroup.alpha = 0f;
 
-            // Position at home location first so world position is correct
+            if (bottleImage != null)
+                bottleImage.sprite = isPure ? purifiedSprite : contaminatedSprite;
+
             transform.SetParent(_homeParent, false);
             _rectTransform.anchoredPosition = _homeAnchoredPos;
-
-            // Then move to canvas root so bottle renders on top of all other UI
             transform.SetParent(_canvas.transform, true);
 
             gameObject.SetActive(true);
@@ -50,6 +62,7 @@ namespace Game.Panels.Customers
 
         public void Deactivate()
         {
+            _activated = false;
             DOTween.To(() => _canvasGroup.alpha, x => _canvasGroup.alpha = x, 0f, 0.2f)
                    .OnComplete(() =>
                    {
@@ -59,9 +72,17 @@ namespace Game.Panels.Customers
                    });
         }
 
+        private void Update()
+        {
+            if (!_activated) return;
+            _timer += Time.deltaTime;
+            if (_timer < _timeout) return;
+            _activated = false;
+            _panel.OnBottleTimedOut(this);
+        }
+
         public void OnBeginDrag(PointerEventData eventData)
         {
-            // Already in canvas root from Activate — just disable raycasts so drop targets are hittable
             _canvasGroup.blocksRaycasts = false;
         }
 
@@ -82,7 +103,7 @@ namespace Game.Panels.Customers
                 Vector2 binScreen = RectTransformUtility.WorldToScreenPoint(cam, _recycleBin.position);
                 if (Vector2.Distance(dropPos, binScreen) <= snapRadius)
                 {
-                    _panel.OnBottleDroppedOnRecycleBin();
+                    _panel.OnBottleRecycled(this);
                     return;
                 }
             }
@@ -98,11 +119,10 @@ namespace Game.Panels.Customers
 
             if (closest >= 0)
             {
-                _panel.OnBottleDroppedOnSlot(closest);
+                _panel.OnBottleDropped(this, closest);
             }
             else
             {
-                // Return to home position visually while staying in canvas root
                 transform.SetParent(_homeParent, false);
                 _rectTransform.anchoredPosition = _homeAnchoredPos;
                 transform.SetParent(_canvas.transform, true);
