@@ -15,7 +15,8 @@ namespace Game
         private void Init()
         {
             if (_initialized) return;
-            if (!ServiceLocator.TryGet<GameConfig>(out _config)) return;
+            if (!ServiceLocator.TryGet<GameManager>(out var gm)) return;
+            _config = gm.Config;
             _initialized = true;
         }
 

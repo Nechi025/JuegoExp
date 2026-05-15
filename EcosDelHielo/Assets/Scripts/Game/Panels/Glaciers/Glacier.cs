@@ -4,72 +4,97 @@ using UnityEngine;
 
 namespace Game.Panels.Glaciers
 {
-    public enum GlacierState { Idle, Regenerating }
+    public enum GlacierState { Active, Broken }
 
     [ExecuteAlways]
     public class Glacier : MonoBehaviour
     {
-        private GameConfig _config;
+        [SerializeField] private Sprite[]       healthSprites;
+        [SerializeField] private SpriteRenderer sr;
 
-        public GlacierState State         { get; private set; } = GlacierState.Idle;
-        public int          ClickCount    { get; private set; }
-        public float        PassiveHealth { get; private set; } = 1f;
-        public float        RegenProgress { get; private set; }
+        private GameConfig   _config;
 
-        public bool IsClickable => State == GlacierState.Idle;
+        public GlacierState State  { get; private set; } = GlacierState.Active;
+        public float         Health { get; private set; } = 1f;
 
-        private void Awake() => ServiceLocator.TryGet<GameConfig>(out _config);
+        private int _clicksThisCycle;
+        private int _targetThisCycle;
+
+        public bool IsClickable => State == GlacierState.Active;
+
+        private void Awake()
+        {
+            if (ServiceLocator.TryGet<GameManager>(out var gm)) _config = gm.Config;
+            RollNewTarget();
+            UpdateSprite();
+        }
+
+        private void OnMouseDown() => OnClick();
 
         public void OnClick()
         {
             if (!IsClickable || _config == null) return;
-            ClickCount++;
-            if (ClickCount >= _config.glacierClicksToBreak)
-                CalveIceCube();
+
+            _clicksThisCycle++;
+            Health = Mathf.Max(0f, Health - _config.glacierClickDamage);
+            Debug.Log($"[Glacier] Click {_clicksThisCycle}/{_targetThisCycle}, health: {Health:F2}");
+
+            if (_clicksThisCycle >= _targetThisCycle)
+            {
+                Debug.Log("[Glacier] Ice ball spawned");
+                GameEventBus.RaiseIceCubeSpawned();
+                RollNewTarget();
+            }
+
+            if (Health <= 0f)
+                Break();
+            else
+                UpdateSprite();
         }
 
-        private void CalveIceCube()
+        private void RollNewTarget()
         {
-            ClickCount    = 0;
-            PassiveHealth = 0f;
-            GameEventBus.RaiseIceCubeSpawned();
-            EnterRegen();
+            _clicksThisCycle = 0;
+            _targetThisCycle = _config != null
+                ? Random.Range(_config.glacierClicksMin, _config.glacierClicksMax + 1)
+                : 10;
+            Debug.Log($"[Glacier] Next ice ball in {_targetThisCycle} clicks");
         }
 
-        private void EnterRegen()
+        private void Break()
         {
-            State         = GlacierState.Regenerating;
-            RegenProgress = 0f;
+            State  = GlacierState.Broken;
+            Health = 0f;
+            Debug.Log("[Glacier] Permanently broken!");
+            GameEventBus.RaiseMistake();
+            UpdateSprite();
         }
 
         public void Tick(float deltaTime)
         {
-            if (State == GlacierState.Idle)
-                TickDecay(deltaTime);
-            else
-                TickRegen(deltaTime);
+            if (_config == null || State == GlacierState.Broken) return;
+            Health -= _config.glacierPassiveDecayRate * deltaTime;
+            if (Health <= 0f)
+            {
+                Health = 0f;
+                Break();
+                return;
+            }
+            UpdateSprite();
         }
 
-        private void TickDecay(float deltaTime)
+        private void UpdateSprite()
         {
-            if (_config == null) return;
-            PassiveHealth -= _config.glacierPassiveDecayRate * deltaTime;
-            if (PassiveHealth > 0f) return;
-            PassiveHealth = 0f;
-            GameEventBus.RaiseMistake();
-            EnterRegen();
+            if (sr == null || healthSprites.Length == 0) return;
+            int idx = Mathf.Clamp(
+                Mathf.RoundToInt(Health * (healthSprites.Length - 1)),
+                0, healthSprites.Length - 1);
+            sr.sprite = healthSprites[idx];
         }
 
-        private void TickRegen(float deltaTime)
+        private void Update()
         {
-            if (_config == null) return;
-            RegenProgress += deltaTime / _config.glacierRegenTime;
-            if (RegenProgress < 1f) return;
-            RegenProgress = 1f;
-            PassiveHealth = 1f;
-            State         = GlacierState.Idle;
+            if (Application.isPlaying) Tick(Time.deltaTime);
         }
-
-        private void Update() => Tick(Time.deltaTime);
     }
 }

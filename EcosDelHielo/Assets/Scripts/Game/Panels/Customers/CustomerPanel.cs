@@ -20,11 +20,8 @@ namespace Game.Panels.Customers
         private float       _spawnTimer;
         private float       _bottleTimer;
 
-        private void Awake()
-        {
-            _config    = ServiceLocator.Get<GameConfig>();
-            _customers = new Customer[customerSlots.Length];
-        }
+        private void Awake()  => _customers = new Customer[customerSlots.Length];
+        private void Start()  => _config    = ServiceLocator.Get<GameManager>().Config;
 
         private void OnEnable()
         {
@@ -44,7 +41,13 @@ namespace Game.Panels.Customers
         {
             if (_pendingBottle != null) return;
             _isPureBottle  = isPure;
-            _pendingBottle = Instantiate(bottlePrefab, bottleSpawnPoint.position, Quaternion.identity);
+            _pendingBottle = Instantiate(bottlePrefab, bottleSpawnPoint.position, Quaternion.identity,
+                                         bottleSpawnPoint.parent);
+
+            var draggable = _pendingBottle.GetComponent<DraggableBottle>()
+                         ?? _pendingBottle.AddComponent<DraggableBottle>();
+            draggable.Init(this, customerSlots, recycleBinZone);
+            Debug.Log($"[CustomerPanel] Bottle spawned — isPure: {isPure}");
         }
 
         private void Update()
@@ -68,6 +71,7 @@ namespace Game.Panels.Customers
             _bottleTimer += deltaTime;
             if (_bottleTimer < _config.bottleTimeout) return;
             _bottleTimer = 0f;
+            Debug.Log("[CustomerPanel] Bottle timed out — mistake");
             Destroy(_pendingBottle);
             _pendingBottle = null;
             GameEventBus.RaiseMistake();
@@ -91,19 +95,29 @@ namespace Game.Panels.Customers
             var go = Instantiate(customerPrefab, customerSlots[slotIndex].position, Quaternion.identity);
             go.transform.SetParent(customerSlots[slotIndex]);
             _customers[slotIndex] = go.GetComponent<Customer>();
+            Debug.Log($"[CustomerPanel] Customer spawned at slot {slotIndex}");
         }
 
-        // Called by the bottle's drag handler when dropped on a customer slot.
         public void OnBottleDroppedOnSlot(int slotIndex)
         {
             if (_pendingBottle == null) return;
             if (slotIndex < 0 || slotIndex >= _customers.Length) return;
-            if (_customers[slotIndex] == null || !_customers[slotIndex].IsActive) return;
+            if (_customers[slotIndex] == null || !_customers[slotIndex].IsActive)
+            {
+                Debug.Log($"[CustomerPanel] Slot {slotIndex} has no active customer — returning bottle");
+                return;
+            }
 
             if (!_isPureBottle)
+            {
+                Debug.Log($"[CustomerPanel] Tainted bottle delivered to slot {slotIndex} — mistake");
                 GameEventBus.RaiseMistake();
+            }
             else
+            {
+                Debug.Log($"[CustomerPanel] Pure bottle delivered to slot {slotIndex} — success");
                 GameEventBus.RaiseDeliverySuccess();
+            }
 
             _customers[slotIndex].Serve();
             Destroy(_pendingBottle);
@@ -111,10 +125,10 @@ namespace Game.Panels.Customers
             _bottleTimer   = 0f;
         }
 
-        // Called by the bottle's drag handler when dropped on the recycle bin.
         public void OnBottleDroppedOnRecycleBin()
         {
             if (_pendingBottle == null) return;
+            Debug.Log("[CustomerPanel] Bottle recycled");
             Destroy(_pendingBottle);
             _pendingBottle = null;
             _bottleTimer   = 0f;

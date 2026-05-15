@@ -3,18 +3,13 @@ using UnityEngine;
 
 namespace Game
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : MonoBehaviour, IService
     {
         [SerializeField] private GameConfig config;
 
-        private void Awake()
-        {
-            ServiceLocator.Register<GameConfig>(config);
-        }
+        public GameConfig Config => config;
 
-        private void OnDestroy()
-        {
-            ServiceLocator.Unregister<GameConfig>();
-        }
+        private void Awake()  => ServiceLocator.Register<GameManager>(this);
+        private void OnDestroy() => ServiceLocator.Unregister<GameManager>();
     }
 }

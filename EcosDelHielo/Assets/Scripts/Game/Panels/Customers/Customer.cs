@@ -7,23 +7,21 @@ namespace Game.Panels.Customers
     public class Customer : MonoBehaviour
     {
         private GameConfig _config;
+        private GameConfig Config => _config ??= ServiceLocator.Get<GameManager>().Config;
+
         private float _patience;
         private bool  _isServed;
         private bool  _hasLeft;
         private bool  _initialized;
 
         public bool  IsActive          => !_isServed && !_hasLeft;
-        public float PatienceNormalized { get { Init(); return _patience / _config.customerPatienceTime; } }
+        public float PatienceNormalized => IsActive ? _patience / Config.customerPatienceTime : 0f;
 
-        private void Init()
+        private void Awake()
         {
-            if (_initialized) return;
-            _config      = ServiceLocator.Get<GameConfig>();
-            _patience    = _config.customerPatienceTime;
+            _patience    = Config.customerPatienceTime;
             _initialized = true;
         }
-
-        private void Awake() => Init();
 
         public void Serve()
         {
@@ -33,7 +31,6 @@ namespace Game.Panels.Customers
 
         public void Tick(float deltaTime)
         {
-            Init();
             if (!IsActive) return;
             _patience -= deltaTime;
             if (_patience <= 0f) Leave();

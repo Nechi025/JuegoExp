@@ -15,7 +15,7 @@ namespace Game
 
         private void Awake()
         {
-            ServiceLocator.TryGet<GameConfig>(out _config);
+            if (ServiceLocator.TryGet<GameManager>(out var gm)) _config = gm.Config;
             GameEventBus.OnDeliverySuccess += HandleDelivery;
             GameEventBus.OnStateChanged    += HandleStateChanged;
         }
