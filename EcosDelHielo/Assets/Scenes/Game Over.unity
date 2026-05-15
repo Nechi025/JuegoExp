@@ -850,10 +850,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70047b6c3f9bcda42bd2c44468e77b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  messageText: {fileID: 0}
-  playAgainButton: {fileID: 0}
-  menuButton: {fileID: 0}
-  message: The glacier has melted...
+  messageText: {fileID: 1124360481}
+  playAgainButton: {fileID: 461331015}
+  menuButton: {fileID: 369034605}
+  message: The glacier couldn't hold. The world goes thirsty.
 --- !u!1 &661765747
 GameObject:
   m_ObjectHideFlags: 0

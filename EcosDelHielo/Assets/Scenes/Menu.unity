@@ -181,7 +181,7 @@ GameObject:
   - component: {fileID: 299212415}
   - component: {fileID: 299212414}
   - component: {fileID: 299212413}
-  - component: {fileID: 299212412}
+  - component: {fileID: 299212417}
   m_Layer: 5
   m_Name: Canvas (1)
   m_TagString: Untagged
@@ -189,22 +189,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &299212412
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 299212411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70047b6c3f9bcda42bd2c44468e77b64, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  messageText: {fileID: 0}
-  playAgainButton: {fileID: 0}
-  menuButton: {fileID: 0}
-  message: The glacier has melted...
 --- !u!114 &299212413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -289,6 +273,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &299212417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 299212411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d0530877eaf57f4b88963f308ea2193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playButton: {fileID: 468040061}
+  exitButton: {fileID: 351870659}
 --- !u!1 &351870657
 GameObject:
   m_ObjectHideFlags: 0
