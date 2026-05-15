@@ -1,57 +1,49 @@
-using DG.Tweening;
+using Core.SceneSwitching;
+using Core.Services;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Game.UI
 {
     public class GameOverPanel : MonoBehaviour
     {
-        [SerializeField] private CanvasGroup     fadeOverlay;
-        [SerializeField] private CanvasGroup     panelGroup;
         [SerializeField] private TextMeshProUGUI messageText;
         [SerializeField] private Button          playAgainButton;
         [SerializeField] private Button          menuButton;
-
-        [Space]
-        [SerializeField] private string menuSceneName  = "EcosdelHielo";
-        [SerializeField] private string defaultMessage = "The glacier has melted...";
+        [SerializeField] private string          message = "The glacier has melted...";
 
         private void Awake()
         {
-            fadeOverlay.alpha             = 0f;
-            fadeOverlay.blocksRaycasts    = false;
-            panelGroup.alpha              = 0f;
-            panelGroup.interactable       = false;
-            panelGroup.blocksRaycasts     = false;
+            if (messageText != null)
+                messageText.text = message;
 
             playAgainButton.onClick.AddListener(OnPlayAgain);
             menuButton.onClick.AddListener(OnMenu);
-
-            if (messageText != null && !string.IsNullOrEmpty(defaultMessage))
-                messageText.text = defaultMessage;
         }
 
-        private void OnEnable()  => GameEventBus.OnGameOver += HandleGameOver;
-        private void OnDisable() => GameEventBus.OnGameOver -= HandleGameOver;
-
-        private void HandleGameOver()
+        private void OnDestroy()
         {
-            fadeOverlay.blocksRaycasts = true;
-            DOTween.To(() => fadeOverlay.alpha, x => fadeOverlay.alpha = x, 1f, 1.5f)
-                   .SetEase(Ease.InQuad)
-                   .OnComplete(ShowContent);
+            playAgainButton.onClick.RemoveListener(OnPlayAgain);
+            menuButton.onClick.RemoveListener(OnMenu);
         }
 
-        private void ShowContent()
+        private void OnPlayAgain()
         {
-            panelGroup.interactable   = true;
-            panelGroup.blocksRaycasts = true;
-            DOTween.To(() => panelGroup.alpha, x => panelGroup.alpha = x, 1f, 0.5f);
+            if (ServiceLocator.TryGet<ISceneSwitcher>(out var switcher) &&
+                ServiceLocator.TryGet<SceneManifest>(out var manifest))
+                switcher.LoadScene(manifest.game);
+            else
+                Debug.LogWarning("[GameOverPanel] ISceneSwitcher or SceneManifest not found.");
         }
 
-        private void OnPlayAgain() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        private void OnMenu()      => SceneManager.LoadScene(menuSceneName);
+        private void OnMenu()
+        {
+            if (ServiceLocator.TryGet<ISceneSwitcher>(out var switcher) &&
+                ServiceLocator.TryGet<SceneManifest>(out var manifest))
+                switcher.LoadScene(manifest.mainMenu);
+            else
+                Debug.LogWarning("[GameOverPanel] ISceneSwitcher or SceneManifest not found.");
+        }
     }
 }

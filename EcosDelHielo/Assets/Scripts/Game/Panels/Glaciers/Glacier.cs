@@ -21,6 +21,8 @@ namespace Game.Panels.Glaciers
         private static readonly Color IceBlue = new Color(0.5f, 0.8f, 1f);
 
         private RectTransform _rt;
+        private Vector2       _restPosition;
+        private Sequence      _shakeSequence;
         private GameConfig    _config;
         private int           _totalClicks;
         private int           _clicksThisCycle;
@@ -36,7 +38,8 @@ namespace Game.Panels.Glaciers
 
         private void Awake()
         {
-            _rt = GetComponent<RectTransform>();
+            _rt           = GetComponent<RectTransform>();
+            _restPosition = _rt != null ? _rt.anchoredPosition : Vector2.zero;
             if (ServiceLocator.TryGet<GameManager>(out var gm)) _config = gm.Config;
             RollNewTarget();
             UpdateSprite();
@@ -70,16 +73,20 @@ namespace Game.Panels.Glaciers
         {
             if (_rt != null)
             {
-                Vector2 origin = _rt.anchoredPosition;
-                DOTween.Sequence()
-                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin + new Vector2( 6f, 0f), 0.04f))
-                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin + new Vector2(-6f, 0f), 0.04f))
-                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin + new Vector2( 4f, 0f), 0.04f))
-                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, origin,                        0.04f));
+                _shakeSequence?.Kill();
+                _rt.anchoredPosition = _restPosition;
+                _shakeSequence = DOTween.Sequence()
+                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, _restPosition + new Vector2( 6f, 0f), 0.04f))
+                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, _restPosition + new Vector2(-6f, 0f), 0.04f))
+                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, _restPosition + new Vector2( 4f, 0f), 0.04f))
+                    .Append(DOTween.To(() => _rt.anchoredPosition, p => _rt.anchoredPosition = p, _restPosition,                        0.04f));
             }
             if (sr != null)
+            {
+                sr.DOKill();
                 DOTween.To(() => sr.color, x => sr.color = x, IceBlue, 0.1f)
                        .OnComplete(() => DOTween.To(() => sr.color, x => sr.color = x, Color.white, 0.15f));
+            }
             else
                 Debug.LogWarning("[Glacier] sr (Image) is not assigned — tint effect skipped.", this);
 
@@ -101,14 +108,21 @@ namespace Game.Panels.Glaciers
             State = GlacierState.Broken;
             Debug.Log("[Glacier] Permanently broken!");
             PlayBreakEffect();
-            GameEventBus.RaiseGameOver();
         }
 
         private void PlayBreakEffect()
         {
-            if (_rt == null || sr == null) return;
+            if (_rt == null || sr == null)
+            {
+                GameEventBus.RaiseGameOver();
+                return;
+            }
 
-            Vector2 origin   = _rt.anchoredPosition;
+            _shakeSequence?.Kill();
+            _rt.anchoredPosition = _restPosition;
+            if (sr != null) sr.DOKill();
+
+            Vector2 origin   = _restPosition;
             float   duration = 1.2f;
 
             DOTween.Sequence()
@@ -122,7 +136,11 @@ namespace Game.Panels.Glaciers
                     p  => _rt.anchoredPosition = p,
                     origin + new Vector2(0f, -120f),
                     duration).SetEase(Ease.InQuad))
-                .OnComplete(() => gameObject.SetActive(false));
+                .OnComplete(() =>
+                {
+                    gameObject.SetActive(false);
+                    GameEventBus.RaiseGameOver();
+                });
 
             DOTween.To(() => sr.color, x => sr.color = x, new Color(1f, 1f, 1f, 0f), duration)
                    .SetEase(Ease.InQuad)
