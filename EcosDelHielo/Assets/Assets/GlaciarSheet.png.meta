@@ -504,7 +504,7 @@ TextureImporter:
         width: 64
         height: 108
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -512,6 +512,195 @@ TextureImporter:
       bones: []
       spriteID: 5bc1e1d27d093b44d9af84fc38703fb9
       internalID: -689010156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GlaciarSheet_18
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 120
+        width: 64
+        height: 51
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 52184cda6d602ad45846b37894d4dd3f
+      internalID: -425564481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GlaciarSheet_19
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 155
+        width: 63
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f432ea9d988e2742842f167313b3e4b
+      internalID: 1671040513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GlaciarSheet_20
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 255
+        width: 17
+        height: 19
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ae8859a03c2ad444aa1d60c7bf66a4b
+      internalID: 1094567734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GlaciarSheet_21
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 258
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 858abcb6fd51882489bb66c35891aeb3
+      internalID: 328116226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GlaciarSheet_22
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 227
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c5ea1677b905bc444af7824ae8c7196c
+      internalID: -947373011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GlaciarSheet_23
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 221
+        width: 17
+        height: 15
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5fdcabc8fc1dc22488815e01c65ef45d
+      internalID: 383117242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GlaciarSheet_24
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 360
+        width: 16
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 290251d596abe324494e14b5b3fee290
+      internalID: 1950599212
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GlaciarSheet_25
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 424
+        width: 8
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cda28b96e9d54bf4794ee5c6da61ed7d
+      internalID: 126520276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GlaciarSheet_26
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 216
+        width: 48
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e08fbd7c66f8767489100465c79a8056
+      internalID: 700042260
       vertices: []
       indices: 
       edges: []
@@ -539,7 +728,16 @@ TextureImporter:
       GlaciarSheet_15: 1027734775
       GlaciarSheet_16: 315604460
       GlaciarSheet_17: -677499805
+      GlaciarSheet_18: -425564481
+      GlaciarSheet_19: 1671040513
       GlaciarSheet_2: 371496434
+      GlaciarSheet_20: 1094567734
+      GlaciarSheet_21: 328116226
+      GlaciarSheet_22: -947373011
+      GlaciarSheet_23: 383117242
+      GlaciarSheet_24: 1950599212
+      GlaciarSheet_25: 126520276
+      GlaciarSheet_26: 700042260
       GlaciarSheet_3: 702680157
       GlaciarSheet_4: -1617093904
       GlaciarSheet_5: 1866389505

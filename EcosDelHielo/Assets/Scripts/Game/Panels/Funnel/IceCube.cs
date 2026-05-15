@@ -6,10 +6,9 @@ namespace Game.Panels.Funnel
 {
     public class IceCube : MonoBehaviour
     {
-        [SerializeField] private Sprite[]       purifySprites;
-        [SerializeField] private Sprite         purifiedSprite;
+        [SerializeField] private Sprite[]       dirtySprites;
+        [SerializeField] private Sprite[]       cleanSprites;
         [SerializeField] private Sprite         contaminatedSprite;
-        [SerializeField] private SpriteRenderer dirtOverlay;
         [SerializeField] private ParticleSystem hitParticles;
 
         private SpriteRenderer _sr;
@@ -53,29 +52,29 @@ namespace Game.Panels.Funnel
             if (_hasReachedFunnel) return;
             _hasReachedFunnel = true;
             if (_sr != null)
-                _sr.sprite = IsPure ? purifiedSprite : contaminatedSprite;
+                _sr.sprite = IsPure ? PickRandom(cleanSprites, _sr.sprite) : contaminatedSprite;
             Debug.Log($"[IceCube] Reached funnel — IsPure: {IsPure}");
             if (!IsPure) GameEventBus.RaiseMistake();
         }
 
         private void UpdateSprite()
         {
-            float t = _purifyClicksRequired > 0
-                      ? Mathf.Clamp01((float)_purifyClicks / _purifyClicksRequired)
-                      : 1f;
+            if (_sr == null) return;
+            _sr.sprite = IsPure
+                ? PickRandom(cleanSprites, _sr.sprite)
+                : PickRandom(dirtySprites,  _sr.sprite);
+        }
 
-            if (_sr != null && purifySprites.Length > 0)
-            {
-                int idx = Mathf.Clamp(Mathf.RoundToInt(t * (purifySprites.Length - 1)), 0, purifySprites.Length - 1);
-                _sr.sprite = purifySprites[idx];
-            }
+        private static Sprite PickRandom(Sprite[] pool, Sprite current)
+        {
+            if (pool == null || pool.Length == 0) return null;
+            if (pool.Length == 1) return pool[0];
 
-            if (dirtOverlay != null)
-            {
-                Color c = dirtOverlay.color;
-                c.a = 1f - t;
-                dirtOverlay.color = c;
-            }
+            int idx;
+            int attempts = 0;
+            do { idx = Random.Range(0, pool.Length); }
+            while (pool[idx] == current && ++attempts < 10);
+            return pool[idx];
         }
     }
 }

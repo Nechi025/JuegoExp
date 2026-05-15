@@ -90,7 +90,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   emptySprite: {fileID: -1910103692, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
   purifiedBottleSprite: {fileID: -13002787, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
-  contaminatedBottleSprite: {fileID: -13002787, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
+  contaminatedBottleSprite: {fileID: 1950599212, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
+  spawnPoint: {fileID: 0}
+  fillPoint: {fileID: 0}
+  leavePoint: {fileID: 0}
   enterDuration: 0.6
   exitDuration: 0.5
   image: {fileID: 6393410141170502871}

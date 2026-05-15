@@ -88,9 +88,7 @@ namespace Game.Panels.Funnel
             if (!_insideMouth.Contains(cube))
                 _insideMouth.Add(cube);
 
-            if (_parkedQueue.Count > 0) return;
-
-            if (bottleConveyor.IsReadyToFill)
+            if (bottleConveyor.IsReadyToFill && _parkedQueue.Count == 0)
                 DepositCube(cube);
             else
                 ParkCube(cube);
@@ -113,13 +111,16 @@ namespace Game.Panels.Funnel
 
         private void OnBottleArrived()
         {
+            while (_parkedQueue.Count > 0 && _parkedQueue.Peek() == null)
+                _parkedQueue.Dequeue();
+
             if (_parkedQueue.Count > 0)
             {
                 DepositCube(_parkedQueue.Dequeue());
                 return;
             }
 
-            // Cube already inside collider but didn't re-trigger enter
+            // Fallback: cube inside collider whose enter event predated this bottle cycle
             var waiting = _insideMouth.Find(c => c != null);
             if (waiting != null)
                 DepositCube(waiting);
