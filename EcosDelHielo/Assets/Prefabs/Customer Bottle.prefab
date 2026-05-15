@@ -118,8 +118,6 @@ GameObject:
   - component: {fileID: 3841956462132286424}
   - component: {fileID: 5755864064524390548}
   - component: {fileID: 5980537542577347873}
-  - component: {fileID: 2838201276488980558}
-  - component: {fileID: 3306474688401635709}
   m_Layer: 5
   m_Name: Customer Bottle
   m_TagString: Untagged
@@ -168,9 +166,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.5660378, g: 0.16592832, b: 0.1308295, a: 0.92156863}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -184,32 +182,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!225 &2838201276488980558
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7974418534413374843}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
---- !u!114 &3306474688401635709
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7974418534413374843}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 206ea49352311b841b1b5211bef997ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  snapRadius: 150
-  bottleImage: {fileID: 5980537542577347873}
-  purifiedSprite: {fileID: -872268495, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
-  contaminatedSprite: {fileID: -872268495, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
-  dirtyWaterLayer: {fileID: 0}
