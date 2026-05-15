@@ -45,6 +45,18 @@ namespace Game.Panels.Glaciers
             UpdateSprite();
         }
 
+        private void Start()
+        {
+            if (!Application.isPlaying) return;
+            if (_config != null) return;
+            if (ServiceLocator.TryGet<GameManager>(out var gm))
+            {
+                _config = gm.Config;
+                RollNewTarget();
+                UpdateSprite();
+            }
+        }
+
         private void OnMouseDown() => OnClick();
 
         public void OnClick()
