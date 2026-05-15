@@ -12,21 +12,27 @@ namespace Game.Panels.Glaciers
     public class Glacier : MonoBehaviour
     {
         [SerializeField] private Sprite[]       healthSprites;
-        [SerializeField] private Image sr;
+        [SerializeField] private Image          sr;
+        [SerializeField] private Image          fillImage;
+        [SerializeField] private Image          fillImage2;
+        [SerializeField] private Image          skyImage;
         [SerializeField] private ParticleSystem iceParticles;
 
         private static readonly Color IceBlue = new Color(0.5f, 0.8f, 1f);
 
         private RectTransform _rt;
-        private GameConfig   _config;
+        private GameConfig    _config;
+        private int           _totalClicks;
+        private int           _clicksThisCycle;
+        private int           _targetThisCycle;
 
-        public GlacierState State  { get; private set; } = GlacierState.Active;
-        public float         Health { get; private set; } = 1f;
+        public GlacierState State     { get; private set; } = GlacierState.Active;
+        public bool         IsClickable => State == GlacierState.Active;
 
-        private int _clicksThisCycle;
-        private int _targetThisCycle;
-
-        public bool IsClickable => State == GlacierState.Active;
+        private float HealthNormalized =>
+            _config != null
+                ? 1f - Mathf.Clamp01((float)_totalClicks / _config.glacierMaxClicks)
+                : 1f;
 
         private void Awake()
         {
@@ -42,11 +48,12 @@ namespace Game.Panels.Glaciers
         {
             if (!IsClickable || _config == null) return;
 
+            _totalClicks++;
             _clicksThisCycle++;
-            Health = Mathf.Max(0f, Health - _config.glacierClickDamage);
-            Debug.Log($"[Glacier] Click {_clicksThisCycle}/{_targetThisCycle}, health: {Health:F2}");
+            Debug.Log($"[Glacier] Click {_clicksThisCycle}/{_targetThisCycle}, total: {_totalClicks}/{_config.glacierMaxClicks}");
 
             PlayHitEffects();
+            UpdateSprite();
 
             if (_clicksThisCycle >= _targetThisCycle)
             {
@@ -55,10 +62,8 @@ namespace Game.Panels.Glaciers
                 RollNewTarget();
             }
 
-            if (Health <= 0f)
+            if (_totalClicks >= _config.glacierMaxClicks)
                 Break();
-            else
-                UpdateSprite();
         }
 
         private void PlayHitEffects()
@@ -87,19 +92,16 @@ namespace Game.Panels.Glaciers
         private void RollNewTarget()
         {
             _clicksThisCycle = 0;
-            _targetThisCycle = _config != null
-                ? _config.glacierClicksPerIceBall
-                : 1;
+            _targetThisCycle = _config != null ? _config.glacierClicksPerIceBall : 1;
             Debug.Log($"[Glacier] Next ice ball in {_targetThisCycle} clicks");
         }
 
         private void Break()
         {
-            State  = GlacierState.Broken;
-            Health = 0f;
+            State = GlacierState.Broken;
             Debug.Log("[Glacier] Permanently broken!");
-            GameEventBus.RaiseMistake();
             PlayBreakEffect();
+            GameEventBus.RaiseGameOver();
         }
 
         private void PlayBreakEffect()
@@ -127,31 +129,28 @@ namespace Game.Panels.Glaciers
                    .SetDelay(0.2f);
         }
 
-        public void Tick(float deltaTime)
-        {
-            if (_config == null || State == GlacierState.Broken) return;
-            Health -= _config.glacierPassiveDecayRate * deltaTime;
-            if (Health <= 0f)
-            {
-                Health = 0f;
-                Break();
-                return;
-            }
-            UpdateSprite();
-        }
-
         private void UpdateSprite()
         {
-            if (sr == null || healthSprites.Length == 0) return;
-            int idx = Mathf.Clamp(
-                Mathf.RoundToInt(Health * (healthSprites.Length - 1)),
-                0, healthSprites.Length - 1);
-            sr.sprite = healthSprites[idx];
-        }
+            float h = HealthNormalized;
 
-        private void Update()
-        {
-            if (Application.isPlaying) Tick(Time.deltaTime);
+            if (sr != null && healthSprites.Length > 0)
+            {
+                int idx = Mathf.Clamp(
+                    Mathf.RoundToInt(h * (healthSprites.Length - 1)),
+                    0, healthSprites.Length - 1);
+                sr.sprite = healthSprites[idx];
+            }
+
+            if (fillImage != null)
+                fillImage.fillAmount = 1f - h;
+            if (fillImage2 != null)
+                fillImage2.fillAmount = 1f - h;
+            if (skyImage != null)
+            {
+                Color c = skyImage.color;
+                c.a = (192f / 255f) * (1f - h);
+                skyImage.color = c;
+            }
         }
     }
 }

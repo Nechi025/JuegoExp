@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: GameConfig
   m_EditorClassIdentifier: 
   glacierClicksPerIceBall: 1
-  glacierPassiveDecayRate: 0
-  glacierClickDamage: 0.001
+  glacierMaxClicks: 10
   purifyClicksRequired: 3
   cubesPerBottle: 1
   customerPatienceTime: 180

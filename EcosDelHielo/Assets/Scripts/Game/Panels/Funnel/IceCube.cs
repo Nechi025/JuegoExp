@@ -9,6 +9,7 @@ namespace Game.Panels.Funnel
         [SerializeField] private Sprite[]       purifySprites;
         [SerializeField] private Sprite         purifiedSprite;
         [SerializeField] private Sprite         contaminatedSprite;
+        [SerializeField] private SpriteRenderer dirtOverlay;
         [SerializeField] private ParticleSystem hitParticles;
 
         private SpriteRenderer _sr;
@@ -59,12 +60,22 @@ namespace Game.Panels.Funnel
 
         private void UpdateSprite()
         {
-            if (_sr == null || purifySprites.Length == 0) return;
-            float t   = _purifyClicksRequired > 0
-                        ? Mathf.Clamp01((float)_purifyClicks / _purifyClicksRequired)
-                        : 1f;
-            int   idx = Mathf.Clamp(Mathf.RoundToInt(t * (purifySprites.Length - 1)), 0, purifySprites.Length - 1);
-            _sr.sprite = purifySprites[idx];
+            float t = _purifyClicksRequired > 0
+                      ? Mathf.Clamp01((float)_purifyClicks / _purifyClicksRequired)
+                      : 1f;
+
+            if (_sr != null && purifySprites.Length > 0)
+            {
+                int idx = Mathf.Clamp(Mathf.RoundToInt(t * (purifySprites.Length - 1)), 0, purifySprites.Length - 1);
+                _sr.sprite = purifySprites[idx];
+            }
+
+            if (dirtOverlay != null)
+            {
+                Color c = dirtOverlay.color;
+                c.a = 1f - t;
+                dirtOverlay.color = c;
+            }
         }
     }
 }
