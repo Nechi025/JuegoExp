@@ -23,7 +23,8 @@ namespace Game.Panels.Funnel
         private Bottle          _currentBottle;
         private TriggerNotifier _funnelMouthNotifier;
 
-        private readonly List<IceCube>  _activeCubes = new List<IceCube>();
+        private readonly List<IceCube>  _activeCubes  = new List<IceCube>();
+        private readonly List<IceCube>  _insideMouth  = new List<IceCube>();
         private readonly Queue<IceCube> _parkedQueue  = new Queue<IceCube>();
 
         private void Awake()
@@ -31,6 +32,7 @@ namespace Game.Panels.Funnel
             _funnelMouthNotifier = funnelMouth.GetComponent<TriggerNotifier>()
                                 ?? funnelMouth.gameObject.AddComponent<TriggerNotifier>();
             _funnelMouthNotifier.OnEntered += OnIceCubeEnteredMouth;
+            _funnelMouthNotifier.OnExited  += OnIceCubeExitedMouth;
 
             if (bottleConveyor == null)
             {
@@ -47,6 +49,7 @@ namespace Game.Panels.Funnel
         private void OnDestroy()
         {
             _funnelMouthNotifier.OnEntered -= OnIceCubeEnteredMouth;
+            _funnelMouthNotifier.OnExited  -= OnIceCubeExitedMouth;
 
             bottleConveyor.OnArrived  -= OnBottleArrived;
             bottleConveyor.OnDeparted -= OnBottleDeparted;
@@ -79,14 +82,24 @@ namespace Game.Panels.Funnel
         private void OnIceCubeEnteredMouth(Collider2D other)
         {
             if (_gameState != GameState.Playing) return;
-            if (_parkedQueue.Count > 0) return;
             var cube = _activeCubes.Find(c => c != null && c.gameObject == other.gameObject);
             if (cube == null) return;
+
+            if (!_insideMouth.Contains(cube))
+                _insideMouth.Add(cube);
+
+            if (_parkedQueue.Count > 0) return;
 
             if (bottleConveyor.IsReadyToFill)
                 DepositCube(cube);
             else
                 ParkCube(cube);
+        }
+
+        private void OnIceCubeExitedMouth(Collider2D other)
+        {
+            var cube = _insideMouth.Find(c => c != null && c.gameObject == other.gameObject);
+            if (cube != null) _insideMouth.Remove(cube);
         }
 
         private void ParkCube(IceCube cube)
@@ -101,7 +114,15 @@ namespace Game.Panels.Funnel
         private void OnBottleArrived()
         {
             if (_parkedQueue.Count > 0)
+            {
                 DepositCube(_parkedQueue.Dequeue());
+                return;
+            }
+
+            // Cube already inside collider but didn't re-trigger enter
+            var waiting = _insideMouth.Find(c => c != null);
+            if (waiting != null)
+                DepositCube(waiting);
         }
 
         private void OnBottleDeparted(bool _) =>
@@ -110,6 +131,7 @@ namespace Game.Panels.Funnel
         private void DepositCube(IceCube cube)
         {
             _activeCubes.Remove(cube);
+            _insideMouth.Remove(cube);
             var rb = cube.GetComponent<Rigidbody2D>();
             if (rb != null) rb.isKinematic = false;
 
