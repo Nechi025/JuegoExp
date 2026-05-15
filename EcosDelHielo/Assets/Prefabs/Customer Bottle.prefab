@@ -31,8 +31,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3841956462132286424}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.50447917, y: 0.53933316}
@@ -105,80 +104,5 @@ MonoBehaviour:
   snapRadius: 150
   bottleImage: {fileID: 7303114231367141585}
   purifiedSprite: {fileID: -872268495, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
-  contaminatedSprite: {fileID: -872268495, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
-  dirtyWaterLayer: {fileID: 7974418534413374843}
---- !u!1 &7974418534413374843
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3841956462132286424}
-  - component: {fileID: 5755864064524390548}
-  - component: {fileID: 5980537542577347873}
-  m_Layer: 5
-  m_Name: Customer Bottle
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &3841956462132286424
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7974418534413374843}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4003155795887433769}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.50447917, y: 0.53933316}
-  m_AnchorMax: {x: 0.5464792, y: 0.70100003}
-  m_AnchoredPosition: {x: -2.0290527, y: -20.500488}
-  m_SizeDelta: {x: 76.29524, y: 143.0198}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &5755864064524390548
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7974418534413374843}
-  m_CullTransparentMesh: 1
---- !u!114 &5980537542577347873
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7974418534413374843}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.5660378, g: 0.16592832, b: 0.1308295, a: 0.92156863}
-  m_RaycastTarget: 0
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 0
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: -872268495, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 1
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  contaminatedSprite: {fileID: 126520276, guid: 2169e39aa5d9f8b4a83dfce62dc88ee6, type: 3}
+  dirtyWaterLayer: {fileID: 0}

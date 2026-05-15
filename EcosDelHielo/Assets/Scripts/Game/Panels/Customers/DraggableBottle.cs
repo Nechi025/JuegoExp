@@ -8,11 +8,10 @@ namespace Game.Panels.Customers
     [RequireComponent(typeof(CanvasGroup))]
     public class DraggableBottle : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
-        [SerializeField] private float      snapRadius = 150f;
-        [SerializeField] private Image      bottleImage;
-        [SerializeField] private Sprite     purifiedSprite;
-        [SerializeField] private Sprite     contaminatedSprite;
-        [SerializeField] private GameObject dirtyWaterLayer;
+        [SerializeField] private float  snapRadius = 150f;
+        [SerializeField] private Image  bottleImage;
+        [SerializeField] private Sprite purifiedSprite;
+        [SerializeField] private Sprite contaminatedSprite;
 
         private CustomerPanel _panel;
         private Customer[]    _customers;
@@ -52,8 +51,6 @@ namespace Game.Panels.Customers
 
             if (bottleImage != null)
                 bottleImage.sprite = isPure ? purifiedSprite : contaminatedSprite;
-            if (dirtyWaterLayer != null)
-                dirtyWaterLayer.SetActive(!isPure);
 
             transform.SetParent(_homeParent, false);
             _rectTransform.anchoredPosition = _homeAnchoredPos;
