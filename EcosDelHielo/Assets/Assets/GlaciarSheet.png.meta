@@ -72,7 +72,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -693,7 +693,7 @@ TextureImporter:
         width: 48
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -701,6 +701,27 @@ TextureImporter:
       bones: []
       spriteID: e08fbd7c66f8767489100465c79a8056
       internalID: 700042260
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GlaciarSheet_27
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 182
+        width: 62
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f362ac7546c93914097f47ceb8d4d25b
+      internalID: 33067444
       vertices: []
       indices: 
       edges: []
@@ -738,6 +759,7 @@ TextureImporter:
       GlaciarSheet_24: 1950599212
       GlaciarSheet_25: 126520276
       GlaciarSheet_26: 700042260
+      GlaciarSheet_27: 33067444
       GlaciarSheet_3: 702680157
       GlaciarSheet_4: -1617093904
       GlaciarSheet_5: 1866389505
