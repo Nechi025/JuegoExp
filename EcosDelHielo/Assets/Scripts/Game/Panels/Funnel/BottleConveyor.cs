@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,13 +19,15 @@ namespace Game.Panels.Funnel
         [SerializeField] private RectTransform leavePoint;
 
         [Header("Timing")]
-        [SerializeField] private float enterDuration = 0.6f;
-        [SerializeField] private float exitDuration  = 0.5f;
+        [SerializeField] private float enterDuration  = 0.6f;
+        [SerializeField] private float exitDuration   = 0.5f;
+        [SerializeField] private float minSpawnDelay  = 3f;
+        [SerializeField] private float maxSpawnDelay  = 5f;
 
         [SerializeField] private Image image;
 
         private RectTransform _rt;
-        private Tween         _cycleDelay;
+        private Coroutine     _cycleRoutine;
 
         public bool         IsReadyToFill { get; private set; }
         public Action       OnArrived;
@@ -32,43 +35,42 @@ namespace Game.Panels.Funnel
 
         private void Awake() => _rt = GetComponent<RectTransform>();
 
-        private void KillAll()
+        private void StopCycle()
         {
-            _cycleDelay?.Kill();
-            _cycleDelay = null;
+            if (_cycleRoutine != null) { StopCoroutine(_cycleRoutine); _cycleRoutine = null; }
             _rt.DOKill();
         }
 
         public void BeginCycle()
         {
-            KillAll();
+            StopCycle();
             IsReadyToFill        = false;
             image.sprite         = emptySprite;
             _rt.anchoredPosition = new Vector2(spawnPoint.anchoredPosition.x, _rt.anchoredPosition.y);
             gameObject.SetActive(true);
+            _cycleRoutine = StartCoroutine(CycleRoutine());
+        }
 
-            _cycleDelay = DOVirtual.DelayedCall(UnityEngine.Random.Range(3f, 5f), () =>
-            {
-                _cycleDelay = null;
-                Debug.Log("[Bottle] Entering fill position");
-                DOTween.To(
-                        () => _rt.anchoredPosition.x,
-                        x  => _rt.anchoredPosition = new Vector2(x, _rt.anchoredPosition.y),
-                        fillPoint.anchoredPosition.x, enterDuration)
-                    .SetEase(Ease.OutQuad)
-                    .SetTarget(_rt)
-                    .OnComplete(() =>
-                    {
-                        IsReadyToFill = true;
-                        Debug.Log("[Bottle] Ready to fill");
-                        OnArrived?.Invoke();
-                    });
-            });
+        private IEnumerator CycleRoutine()
+        {
+            yield return new WaitForSeconds(UnityEngine.Random.Range(minSpawnDelay, maxSpawnDelay));
+            _cycleRoutine = null;
+            DOTween.To(
+                    () => _rt.anchoredPosition.x,
+                    x  => _rt.anchoredPosition = new Vector2(x, _rt.anchoredPosition.y),
+                    fillPoint.anchoredPosition.x, enterDuration)
+                .SetEase(Ease.OutQuad)
+                .SetTarget(_rt)
+                .OnComplete(() =>
+                {
+                    IsReadyToFill = true;
+                    OnArrived?.Invoke();
+                });
         }
 
         public void Depart(bool isPure)
         {
-            KillAll();
+            StopCycle();
             IsReadyToFill = false;
             image.sprite  = isPure ? purifiedBottleSprite : contaminatedBottleSprite;
             image.transform.DOPunchScale(Vector3.one * 0.25f, 0.3f, 8, 1f);
@@ -81,19 +83,13 @@ namespace Game.Panels.Funnel
                 .SetTarget(_rt)
                 .OnComplete(() =>
                 {
-                    ResetAndDeactivate();
+                    IsReadyToFill        = false;
+                    image.sprite         = emptySprite;
+                    _rt.anchoredPosition = new Vector2(spawnPoint.anchoredPosition.x, _rt.anchoredPosition.y);
                     GameEventBus.RaiseBottleReady(isPure);
                     OnDeparted?.Invoke(isPure);
+                    BeginCycle();
                 });
-        }
-
-        private void ResetAndDeactivate()
-        {
-            KillAll();
-            IsReadyToFill        = false;
-            image.sprite         = emptySprite;
-            _rt.anchoredPosition = new Vector2(spawnPoint.anchoredPosition.x, _rt.anchoredPosition.y);
-            gameObject.SetActive(false);
         }
     }
 }

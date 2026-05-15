@@ -39,8 +39,7 @@ namespace Game.Panels.Funnel
                 Debug.LogError("[FunnelPanel] bottleConveyor is not assigned in the Inspector.", this);
                 return;
             }
-            bottleConveyor.OnArrived  += OnBottleArrived;
-            bottleConveyor.OnDeparted += OnBottleDeparted;
+            bottleConveyor.OnArrived += OnBottleArrived;
 
             GameEventBus.OnIceCubeSpawned += HandleIceCubeSpawned;
             GameEventBus.OnStateChanged   += HandleStateChanged;
@@ -51,8 +50,7 @@ namespace Game.Panels.Funnel
             _funnelMouthNotifier.OnEntered -= OnIceCubeEnteredMouth;
             _funnelMouthNotifier.OnExited  -= OnIceCubeExitedMouth;
 
-            bottleConveyor.OnArrived  -= OnBottleArrived;
-            bottleConveyor.OnDeparted -= OnBottleDeparted;
+            bottleConveyor.OnArrived -= OnBottleArrived;
 
             GameEventBus.OnIceCubeSpawned -= HandleIceCubeSpawned;
             GameEventBus.OnStateChanged   -= HandleStateChanged;
@@ -88,7 +86,10 @@ namespace Game.Panels.Funnel
             if (!_insideMouth.Contains(cube))
                 _insideMouth.Add(cube);
 
-            if (bottleConveyor.IsReadyToFill && _parkedQueue.Count == 0)
+            // Only one cube waits at a time; others stay free until that slot clears
+            if (_parkedQueue.Count > 0) return;
+
+            if (bottleConveyor.IsReadyToFill)
                 DepositCube(cube);
             else
                 ParkCube(cube);
@@ -120,14 +121,17 @@ namespace Game.Panels.Funnel
                 return;
             }
 
-            // Fallback: cube inside collider whose enter event predated this bottle cycle
-            var waiting = _insideMouth.Find(c => c != null);
-            if (waiting != null)
+            // Fallback: cube already inside collider that won't re-trigger enter
+            for (int i = _insideMouth.Count - 1; i >= 0; i--)
+            {
+                if (_insideMouth[i] == null) { _insideMouth.RemoveAt(i); continue; }
+                var waiting = _insideMouth[i];
+                var rb = waiting.GetComponent<Rigidbody2D>();
+                if (rb != null) { rb.velocity = Vector2.zero; rb.isKinematic = true; }
                 DepositCube(waiting);
+                return;
+            }
         }
-
-        private void OnBottleDeparted(bool _) =>
-            bottleConveyor.BeginCycle();
 
         private void DepositCube(IceCube cube)
         {
